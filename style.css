@@ -8,7 +8,7 @@ body {
 }
 
 .chat-container {
-    width: 400px;
+    width: 900px;
     background: white;
     padding: 20px;
     border-radius: 10px;
@@ -17,21 +17,25 @@ body {
     flex-direction: column;
     height: 500px;
     overflow: hidden;
+    position: relative; /* To position the clear chat button inside */
 }
 
 #chat-box {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: auto; /* Enables vertical scrolling for chatbox */
     padding: 10px;
     display: flex;
     flex-direction: column;
+    gap: 10px; /* Spacing between messages */
+    scroll-behavior: smooth; /* Smooth scroll when new messages are added */
 }
 
 .chat-message {
     padding: 10px;
     margin: 5px;
     border-radius: 10px;
-    max-width: 80%;
+    max-width: 100%;
+    word-wrap: break-word; /* Ensure messages wrap properly */
 }
 
 .user-message {
@@ -46,87 +50,133 @@ body {
     color: black;
 }
 
-.input-container {
-    display: flex;
-    gap: 10px;
-}
-
-input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-button {
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
+/* Code block specific styles */
 .code-message {
     background-color: #282c34;
     color: #fff;
-    padding: 10px;
+    padding: 15px;
     margin: 5px;
     border-radius: 10px;
     position: relative;
-    max-width: 90%;
-    word-wrap: break-word;
-    overflow-x: auto;
+    max-width: 100%; /* Ensure it fits within the chat box */
+    white-space: pre-wrap; /* Preserve code formatting and wrap text */
+    word-wrap: break-word; /* Ensure code breaks properly within the box */
+    font-family: "Courier New", Courier, monospace;
 }
-
-.code-message pre {
-    white-space: pre-wrap;
-    overflow-x: auto;
-    font-family: "Courier New", monospace;
-    font-size: 14px;
-    margin: 0;
-}
-
+/* Style for the copy button */
 .copy-button {
     position: absolute;
-    top: 5px;
+    top: 10px;
     right: 10px;
     background-color: #007bff;
     color: white;
     border: none;
-    padding: 5px;
-    font-size: 12px;
+    padding: 5px 10px;
     cursor: pointer;
     border-radius: 5px;
+    z-index: 10;
 }
 
-.copy-button:hover {
-    background-color: #0056b3;
-}
-.loading {
+/* Input area styles */
+/* Input area styles */
+.input-container {
     display: flex;
-    gap: 5px;
-    align-items: center;
-    justify-content: flex-start;
+    gap: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-top: 1px solid #ccc;
+    justify-content: space-between;
 }
 
-.dot {
-    width: 8px;
-    height: 8px;
+input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid #ccc;
+    border-radius: 25px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    background-color: #f5f7fa;
+}
+
+input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+}
+
+button {
+    padding: 12px 18px;
     background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 80px;
+}
+
+button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+button:active {
+    transform: scale(1);
+}
+
+/* Focus styles for input and button */
+.input-container:focus-within {
+    border-color: #007bff;
+}
+
+/* Disable button styles */
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+
+
+/* Clear chat button styling */
+.clear-chat {
+    width: 35px;
+    height: 35px;
+    background-color: #007bff;
+    color: white;
+    border: none;
     border-radius: 50%;
-    animation: blink 1.4s infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    transition: background-color 0.3s ease-in-out, transform 0.2s;
 }
 
-.dot:nth-child(2) {
-    animation-delay: 0.2s;
+.clear-chat:hover {
+    background-color: #0056b3;
+    transform: scale(1.1);
 }
 
-.dot:nth-child(3) {
-    animation-delay: 0.4s;
+/* Tooltip styling */
+.tooltip {
+    position: absolute;
+    right: 40px;
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    opacity: 0;
+    white-space: nowrap;
+    transform: translateX(-10px);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
-@keyframes blink {
-    0% { opacity: 0.2; }
-    50% { opacity: 1; }
-    100% { opacity: 0.2; }
+.clear-chat-container:not(:hover) .tooltip {
+    opacity: 0;
+    transform: translateX(-10px);
 }
