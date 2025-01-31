@@ -9,7 +9,7 @@ async function sendMessage() {
     appendMessage("User", message, "user-message");
     userInput.value = "";
 
-    const loadingMessage = appendMessage("Bot", "Thinking...", "bot-message", true);
+    const loadingMessage = appendLoadingMessage(); // Show animated loader
 
     try {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`, {
@@ -21,7 +21,7 @@ async function sendMessage() {
         });
 
         const data = await response.json();
-        loadingMessage.remove(); // Remove "Thinking..." message
+        loadingMessage.remove(); // Remove loader when response arrives
 
         if (data?.candidates?.length > 0) {
             let fullResponse = "";
@@ -44,16 +44,29 @@ async function sendMessage() {
     }
 }
 
-function appendMessage(sender, text, className, isLoading = false) {
+function appendMessage(sender, text, className) {
     const msgDiv = document.createElement("div");
     msgDiv.classList.add("chat-message", className);
-    if (isLoading) msgDiv.classList.add("loading");
-
     msgDiv.textContent = text;
     chatBox.appendChild(msgDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
+}
 
-    return msgDiv; // Return message div for removal if needed
+function appendLoadingMessage() {
+    const loaderDiv = document.createElement("div");
+    loaderDiv.classList.add("chat-message", "bot-message", "loading");
+
+    // Loader dots animation
+    loaderDiv.innerHTML = `
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+    `;
+
+    chatBox.appendChild(loaderDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    return loaderDiv; // Return loader div for removal later
 }
 
 function appendCodeMessage(codeText) {
