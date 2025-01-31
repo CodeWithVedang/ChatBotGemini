@@ -1,4 +1,4 @@
-const API_KEY = "AIzaSyCIQ8ueVkFNRNYbC6zMSJIkTVne49FMbuw"; // Replace with your actual Gemini AI API key
+const API_KEY = "AIzaSyCIQ8ueVkFNRNYbC6zMSJIkTVne49FMbuw"; // Replace with your Gemini API key
 const chatBox = document.getElementById("chat-box");
 const userInput = document.getElementById("user-input");
 
@@ -12,20 +12,27 @@ async function sendMessage() {
     appendMessage("Bot", "Thinking...", "bot-message", true);
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateText?key=${API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt: { text: message } }),
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: message }] }]
+            }),
         });
 
         const data = await response.json();
         document.querySelector(".loading")?.remove();
-        
-        const botMessage = data?.candidates?.[0]?.output || "Sorry, I couldn't process that.";
-        appendMessage("Bot", botMessage, "bot-message");
+
+        if (data?.candidates?.length > 0) {
+            const botMessage = data.candidates[0].content.parts[0].text;
+            appendMessage("Bot", botMessage, "bot-message");
+        } else {
+            appendMessage("Bot", "Sorry, I couldn't understand that.", "bot-message");
+        }
     } catch (error) {
         document.querySelector(".loading")?.remove();
         appendMessage("Bot", "Oops! Something went wrong.", "bot-message");
+        console.error("Error:", error);
     }
 }
 
