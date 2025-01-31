@@ -28,7 +28,12 @@ async function sendMessage() {
             data.candidates[0].content.parts.forEach(part => {
                 fullResponse += part.text + " ";
             });
-            appendMessage("Bot", fullResponse.trim(), "bot-message");
+
+            if (fullResponse.includes("```")) {
+                appendCodeMessage(fullResponse.trim());
+            } else {
+                appendMessage("Bot", fullResponse.trim(), "bot-message");
+            }
         } else {
             appendMessage("Bot", "Sorry, I couldn't understand that.", "bot-message");
         }
@@ -47,6 +52,40 @@ function appendMessage(sender, text, className, isLoading = false) {
     msgDiv.textContent = text;
     chatBox.appendChild(msgDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
-    
+
     return msgDiv; // Return message div for removal if needed
+}
+
+function appendCodeMessage(codeText) {
+    const codeBlock = document.createElement("div");
+    codeBlock.classList.add("code-message");
+
+    // Extracting code between triple backticks ```
+    const codeContent = codeText.match(/```([\s\S]*?)```/);
+    const codeSnippet = codeContent ? codeContent[1].trim() : codeText;
+
+    // Create a preformatted text block
+    const preTag = document.createElement("pre");
+    const codeTag = document.createElement("code");
+    codeTag.textContent = codeSnippet;
+    preTag.appendChild(codeTag);
+
+    // Create a Copy button
+    const copyButton = document.createElement("button");
+    copyButton.innerHTML = "📋 Copy Code";
+    copyButton.classList.add("copy-button");
+    copyButton.onclick = () => {
+        navigator.clipboard.writeText(codeSnippet);
+        copyButton.innerHTML = "✅ Copied!";
+        setTimeout(() => {
+            copyButton.innerHTML = "📋 Copy Code";
+        }, 2000);
+    };
+
+    // Append everything to the code block
+    codeBlock.appendChild(copyButton);
+    codeBlock.appendChild(preTag);
+
+    chatBox.appendChild(codeBlock);
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
