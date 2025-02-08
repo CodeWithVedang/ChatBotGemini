@@ -261,6 +261,27 @@ body {
     font-weight: 100;
     margin-top: 10px;
 }
+.github-icon {
+
+    margin-top: 10px;
+    text-decoration: none;
+    color: #fff;
+    background-color: #333;
+    padding: 10px;
+    border-radius: 5px;
+    
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height:fit-content;
+  
+}
+
+.github-icon svg {
+    vertical-align: middle;
+    margin-right: 5px;
+
+}
 @keyframes typing {
     0%, 100% {
         transform: translateY(0);
