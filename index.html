@@ -5,7 +5,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gemini AI Chat</title>
-    <script async src="https://api.countapi.xyz/hit/chat-bot-gemini-beta.vercel.app/visits?callback=liveViews"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -25,13 +24,30 @@
             >
             <button id="send-btn">Send</button>
         </div>
-        <div class="views"> <h1>Total Views - <span id="visits"></span></h1></div>
+        <div id="views-counter" style="text-align: center; margin-top: 10px; font-size: 0.9em; color: #666;">
+            Loading views...
+        </div>
     </div>
-    <script>
-        function liveViews(response){
-    document.getElementById('visits').innerText=response.value;     
-}
-    </script>
+
     <script src="script.js"></script>
+    <script>
+        // Fetch and display views
+        async function updateViews() {
+            try {
+                // Increment views
+                await fetch('/api/views', { method: 'POST' });
+
+                // Fetch updated views
+                const response = await fetch('/api/views');
+                const data = await response.json();
+                document.getElementById('views-counter').textContent = `Total Views: ${data.views}`;
+            } catch (error) {
+                console.error('Failed to update views:', error);
+                document.getElementById('views-counter').textContent = 'Failed to load views';
+            }
+        }
+
+        updateViews();
+    </script>
 </body>
 </html>
