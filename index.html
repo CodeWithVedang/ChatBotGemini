@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gemini AI Chat</title>
     <script async src="https://api.countapi.xyz/hit/chat-bot-gemini-beta.vercel.app/visits?callback=liveViews"></script>
-
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -26,8 +25,13 @@
             >
             <button id="send-btn">Send</button>
         </div>
-        <div class="views"> <h1>Total Views - <span id="visits"></span> views</h1></div>
+        <div class="views"> <h1>Total Views - <span id="visits"></span></h1></div>
     </div>
+    <script>
+        function liveViews(response){
+    document.getElementById('visits').innerText=response.value;     
+}
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
