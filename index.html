@@ -2,10 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gemini AI Chat</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script>
+        // Your Firebase configuration (REPLACE THESE WITH YOUR ACTUAL VALUES)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBcaSNQuZizwEo39oz5zpCirHyuSK78Htk",
+            authDomain: "basic-curve-447915-i9.firebaseapp.com",
+            projectId: "basic-curve-447915-i9",
+            storageBucket: "basic-curve-447915-i9.firebasestorage.app",
+            messagingSenderId: "824954986365",
+            appId: "1:824954986365:web:fc974280d4da46ae1f3614",
+            measurementId: "G-50LPQ2GDHK"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const pageViewsCollection = db.collection('page_views');
+        const pageViewDoc = pageViewsCollection.doc('home');
+    </script>
 </head>
 <body>
     <div class="chat-container">
@@ -13,41 +32,59 @@
             <h2>Gemini AI Assistant</h2>
             <button id="clear-chat"><i class="fas fa-trash-alt"></i> Clear</button> 
         </div>
-        <div class="chat-box" id="chat-box">
-        </div>
+        <div class="chat-box" id="chat-box"></div>
         <div class="chat-input">
-            <input 
-                type="text" 
-                id="user-input" 
-                placeholder="Type your message here..."
-                autocomplete="off"
-            >
+            <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off">
             <button id="send-btn">Send</button>
         </div>
-        <div id="views-counter" style="text-align: center; margin-top: 10px; font-size: 0.9em; color: #666;">
-            Loading views...
-        </div>
+        <div id="view-count-container"></div>  <!-- View count will be displayed here -->
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js"></script>  
     <script>
-        // Fetch and display views
-        async function updateViews() {
-            try {
-                // Increment views
-                await fetch('/api/views', { method: 'POST' });
+    document.addEventListener('DOMContentLoaded', async () => {
+    await incrementPageViews();
+    displayPageViews();
+});
 
-                // Fetch updated views
-                const response = await fetch('/api/views');
-                const data = await response.json();
-                document.getElementById('views-counter').textContent = `Total Views: ${data.views}`;
-            } catch (error) {
-                console.error('Failed to update views:', error);
-                document.getElementById('views-counter').textContent = 'Failed to load views';
-            }
+// ✅ FIXED: Ensures document exists before updating the count.
+async function incrementPageViews() {
+    try {
+        const docSnapshot = await pageViewDoc.get();
+        if (docSnapshot.exists) {
+            await pageViewDoc.update({
+                count: firebase.firestore.FieldValue.increment(1)
+            });
+        } else {
+            await pageViewDoc.set({ count: 1 });
         }
+    } catch (error) {
+        console.error("Error incrementing page views:", error);
+    }
+}
 
-        updateViews();
+// ✅ FIXED: Uses real-time updates to always display the latest count.
+function displayPageViews() {
+    pageViewDoc.onSnapshot((docSnapshot) => {
+        if (docSnapshot.exists) {
+            const viewCount = docSnapshot.data().count;
+            console.log(`Total Page Views: ${viewCount}`); // Debugging
+
+            // Ensure view count container exists before updating
+            const viewCountContainer = document.getElementById('view-count-container');
+            if (viewCountContainer) {
+                viewCountContainer.innerText = `Total Page Views: ${viewCount}`;
+            } else {
+                console.error("View count container not found in DOM.");
+            }
+        } else {
+            console.log("Document doesn't exist yet.");
+        }
+    }, (error) => {
+        console.error("Error fetching real-time updates:", error);
+    });
+}
+
     </script>
 </body>
 </html>

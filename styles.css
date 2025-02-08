@@ -253,7 +253,14 @@ body {
 .typing-indicator span:nth-child(3) {
     animation-delay: 0.4s;
 }
-
+#view-count-container {
+    text-align: center;
+    padding: 10px;
+    font-size: 1rem;
+    color: #555;
+    font-weight: 100;
+    margin-top: 10px;
+}
 @keyframes typing {
     0%, 100% {
         transform: translateY(0);
