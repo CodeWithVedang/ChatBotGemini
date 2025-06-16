@@ -1,8 +1,9 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const chatBox = document.getElementById('chat-box');
     const userInput = document.getElementById('user-input');
     const sendBtn = document.getElementById('send-btn');
     const clearChatBtn = document.getElementById('clear-chat');
+    const viewCountContainer = document.getElementById('view-count-container');
 
     let messages = JSON.parse(localStorage.getItem('chatMessages')) || [];
     messages.forEach(msg => appendMessage(msg.role, msg.content));
@@ -17,6 +18,25 @@ document.addEventListener('DOMContentLoaded', () => {
         chatBox.innerHTML = '';
         messages = [];
     });
+
+    // Your Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBcaSNQuZizwEo39oz5zpCirHyuSK78Htk",
+        authDomain: "basic-curve-447915-i9.firebaseapp.com",
+        projectId: "basic-curve-447915-i9",
+        storageBucket: "basic-curve-447915-i9.firebasestorage.app",
+        messagingSenderId: "824954986365",
+        appId: "1:824954986365:web:fc974280d4da46ae1f3614",
+        measurementId: "G-50LPQ2GDHK"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const pageViewsCollection = db.collection('page_views');
+    const pageViewDoc = pageViewsCollection.doc('home');
+
+    // Increment and display page views
+    await incrementPageViews();
+    displayPageViews();
 
     function formatText(text) {
         const boldRegex = /\*\*(.*?)\*\*/g;
@@ -122,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('chatMessages', JSON.stringify(messages));
         }).catch(error => {
             chatBox.removeChild(typingIndicator);
-            appendMessage('bot', 'Sorry, I encountered an error: ' + error.message);
+            appendMessage('bot', `Sorry, I encountered an error: ${error.message}. Please check the API key, model name, or endpoint.`);
         });
     }
 
@@ -201,9 +221,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    async function incrementPageViews() {
+        try {
+            const docSnapshot = await pageViewDoc.get();
+            if (docSnapshot.exists) {
+                await pageViewDoc.update({
+                    count: firebase.firestore.FieldValue.increment(1)
+                });
+            } else {
+                await pageViewDoc.set({ count: 1 });
+            }
+        } catch (error) {
+            console.error("Error incrementing page views:", error);
+            if (viewCountContainer) {
+                viewCountContainer.innerText = "Error loading views";
+            }
+        }
+    }
+
+    function displayPageViews() {
+        pageViewDoc.onSnapshot((docSnapshot) => {
+            if (docSnapshot.exists) {
+                const viewCount = docSnapshot.data().count;
+                console.log(`Total Page Views: ${viewCount}`); // Debugging
+                if (viewCountContainer) {
+                    viewCountContainer.innerHTML = `<i class="fas fa-eye"></i> Total Page Views: ${viewCount}`;
+                }
+            } else {
+                console.log("Document doesn't exist yet.");
+                if (viewCountContainer) {
+                    viewCountContainer.innerText = "No views yet";
+                }
+            }
+        }, (error) => {
+            console.error("Error fetching real-time updates:", error);
+            if (viewCountContainer) {
+                viewCountContainer.innerText = "Error loading views";
+            }
+        });
+    }
+
     async function fetchGeminiResponse(userMessage) {
-        const apiKey = 'AIzaSyCk4f8ifiVPbww5cCrpqtTv-ZnKClv6tj8'; // Replace with your actual API key
-        const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+        const apiKey = 'AIzaSyCk4f8ifiVPbww5cCrpqtTv-ZnKClv6tj8'; // Replace with your actual API key or use a secure method
+        const apiUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent';
 
         try {
             const response = await fetch(`${apiUrl}?key=${apiKey}`, {
@@ -238,4 +298,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
-
