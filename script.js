@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function fetchGeminiResponse(userMessage) {
-        const apiKey = 'AIzaSyCIQ8ueVkFNRNYbC6zMSJIkTVne49FMbuw'; // Replace with your actual API key
+        const apiKey = 'AIzaSyCk4f8ifiVPbww5cCrpqtTv-ZnKClv6tj8'; // Replace with your actual API key
         const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
 
         try {
